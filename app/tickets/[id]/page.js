@@ -345,6 +345,80 @@ export default function TicketDetailsPage() {
             </div>
           </div>
 
+          {/* Live Courier Tracking from trackmyorder.pk */}
+          {ticket.liveTracking && ticket.liveTracking.success !== false && (
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+              <h3 className="font-bold text-white text-base flex items-center gap-1.5">
+                <RefreshCw className="h-4 w-4 text-blue-500" />
+                Live Courier Status
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-2 border-b border-slate-800 pb-3">
+                <div>
+                  <span className="text-[10px] text-slate-500 block uppercase tracking-wider">Live Status</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase mt-1">
+                    {ticket.liveTracking.status || "Unknown"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 block uppercase tracking-wider">Courier Code</span>
+                  <span className="font-bold text-slate-300 text-xs block mt-1">
+                    {ticket.liveTracking.courier}
+                  </span>
+                </div>
+              </div>
+
+              {(ticket.liveTracking.origin || ticket.liveTracking.destination) && (
+                <div className="border-b border-slate-800 pb-3">
+                  <span className="text-[10px] text-slate-500 block uppercase tracking-wider mb-1">Route</span>
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="font-semibold text-white">{ticket.liveTracking.origin?.city || "N/A"}</span>
+                    <span className="text-slate-500">→</span>
+                    <span className="font-semibold text-white">{ticket.liveTracking.destination?.city || "N/A"}</span>
+                  </div>
+                </div>
+              )}
+
+              {ticket.liveTracking.receiver?.name && (
+                <div className="border-b border-slate-800 pb-3">
+                  <span className="text-[10px] text-slate-500 block uppercase tracking-wider">Receiver</span>
+                  <span className="font-semibold text-slate-300 text-xs block">{ticket.liveTracking.receiver.name}</span>
+                </div>
+              )}
+
+              {ticket.liveTracking.history && ticket.liveTracking.history.length > 0 ? (
+                <div className="pt-1">
+                  <span className="text-[10px] text-slate-500 block uppercase tracking-wider font-semibold mb-2">Tracking History</span>
+                  <div className="space-y-3 relative pl-3.5 border-l border-slate-800">
+                    {ticket.liveTracking.history.map((event, index) => {
+                      const isLatest = index === 0;
+                      return (
+                        <div key={index} className="relative">
+                          <div className={`absolute -left-[20px] top-1 w-2.5 h-2.5 rounded-full border border-slate-950 ${
+                            isLatest 
+                              ? "bg-blue-500 animate-pulse" 
+                              : "bg-slate-800"
+                          }`} />
+                          <div className={`font-semibold text-xs ${isLatest ? "text-blue-400" : "text-slate-300"}`}>
+                            {event.status || "EVENT"}
+                          </div>
+                          <div className="text-[10px] text-slate-400 mt-0.5 leading-snug">
+                            {event.description}
+                          </div>
+                          <div className="text-[9px] text-slate-500 mt-0.5">
+                            {format(new Date(event.datetime), "PPpp")}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center text-slate-500 py-2 text-xs">No tracking events found.</div>
+              )}
+            </div>
+          )}
+
           {/* Status Controls */}
           {ticket.currentStatus !== 'CLOSED' && (
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">

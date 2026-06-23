@@ -33,6 +33,8 @@ export default function TicketsListPage() {
   const [user, setUser] = useState(null)
   const [tickets, setTickets] = useState([])
   const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState(null)
+  const [slaBreachedFilter, setSlaBreachedFilter] = useState(false)
   
   // Filters
   const [status, setStatus] = useState("")
@@ -58,11 +60,17 @@ export default function TicketsListPage() {
       }
       if (status) params.status = status
       if (search) params.search = search
+      if (slaBreachedFilter) params.slaBreached = "true"
 
       const res = await courierPortalApi.getTickets(params)
       if (res && res.tickets) {
         setTickets(res.tickets)
         setTotalPages(res.pagination.totalPages)
+      }
+
+      const statsRes = await courierPortalApi.getStats()
+      if (statsRes && !statsRes.error) {
+        setStats(statsRes)
       }
     } catch (err) {
       console.error(err)
@@ -75,7 +83,7 @@ export default function TicketsListPage() {
     if (user) {
       fetchTickets()
     }
-  }, [user, page, status])
+  }, [user, page, status, slaBreachedFilter])
 
   const handleSearchSubmit = (e) => {
     e.preventDefault()
@@ -115,6 +123,71 @@ export default function TicketsListPage() {
           <p className="text-sm text-slate-400">Review tickets raised by Nakson Group merchants for LCS deliveries.</p>
         </div>
 
+        {/* Stats Dashboard */}
+        {stats && (
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-5">
+            <div 
+              className={`cursor-pointer hover:border-blue-500/50 bg-slate-900 border border-slate-800 rounded-xl p-4 transition duration-200 ${!status && !slaBreachedFilter ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
+              onClick={() => { setStatus(""); setSlaBreachedFilter(false); setPage(1); }}
+            >
+              <div className="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                <span>Total Assigned</span>
+                <MessageSquare className="h-4 w-4 text-slate-500" />
+              </div>
+              <div className="text-2xl font-bold text-white">{stats.total}</div>
+              <p className="text-[10px] text-slate-500 mt-1">All tickets assigned to desk</p>
+            </div>
+            
+            <div 
+              className={`cursor-pointer hover:border-blue-500/50 bg-slate-900 border border-slate-800 rounded-xl p-4 transition duration-200 ${status === "OPEN" ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
+              onClick={() => { setStatus("OPEN"); setSlaBreachedFilter(false); setPage(1); }}
+            >
+              <div className="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                <span>Open</span>
+                <Clock className="h-4 w-4 text-blue-400" />
+              </div>
+              <div className="text-2xl font-bold text-blue-400">{stats.open}</div>
+              <p className="text-[10px] text-slate-500 mt-1">New issues requiring response</p>
+            </div>
+
+            <div 
+              className={`cursor-pointer hover:border-blue-500/50 bg-slate-900 border border-slate-800 rounded-xl p-4 transition duration-200 ${status === "PENDING_COURIER" ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
+              onClick={() => { setStatus("PENDING_COURIER"); setSlaBreachedFilter(false); setPage(1); }}
+            >
+              <div className="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                <span>Action Required</span>
+                <Clock className="h-4 w-4 text-orange-400" />
+              </div>
+              <div className="text-2xl font-bold text-orange-400">{stats.pendingCourier}</div>
+              <p className="text-[10px] text-slate-500 mt-1">Awaiting courier action</p>
+            </div>
+
+            <div 
+              className={`cursor-pointer hover:border-blue-500/50 bg-slate-900 border border-slate-800 rounded-xl p-4 transition duration-200 ${status === "PENDING_COMPANY" ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
+              onClick={() => { setStatus("PENDING_COMPANY"); setSlaBreachedFilter(false); setPage(1); }}
+            >
+              <div className="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                <span>Pending Merchant</span>
+                <Clock className="h-4 w-4 text-purple-400" />
+              </div>
+              <div className="text-2xl font-bold text-purple-400">{stats.pendingCompany}</div>
+              <p className="text-[10px] text-slate-500 mt-1">Awaiting merchant reply</p>
+            </div>
+
+            <div 
+              className={`cursor-pointer hover:border-red-500/50 bg-slate-900 border border-slate-800 rounded-xl p-4 transition duration-200 col-span-2 md:col-span-1 ${slaBreachedFilter ? "border-red-500 ring-1 ring-red-500/50" : ""}`}
+              onClick={() => { setStatus(""); setSlaBreachedFilter(true); setPage(1); }}
+            >
+              <div className="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                <span>SLA Breached</span>
+                <AlertTriangle className="h-4 w-4 text-red-500 animate-pulse" />
+              </div>
+              <div className="text-2xl font-bold text-red-500">{stats.resolutionBreached}</div>
+              <p className="text-[10px] text-red-500/80 font-semibold mt-1">Resolution SLA missed</p>
+            </div>
+          </div>
+        )}
+
         {/* Filter bar */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-slate-900 border border-slate-800 p-4 rounded-xl">
           <form onSubmit={handleSearchSubmit} className="flex flex-1 items-center space-x-2 max-w-md">
@@ -136,7 +209,7 @@ export default function TicketsListPage() {
           <div className="flex items-center gap-2">
             <select
               value={status}
-              onChange={(e) => { setStatus(e.target.value); setPage(1); }}
+              onChange={(e) => { setStatus(e.target.value); setSlaBreachedFilter(false); setPage(1); }}
               className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Statuses</option>
