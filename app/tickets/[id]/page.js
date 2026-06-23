@@ -221,38 +221,68 @@ export default function TicketDetailsPage() {
                 {ticket.customerRemarks}
               </div>
               {ticket.attachments && ticket.attachments.filter(att => !att.responseId).length > 0 && (
-                <div className="mt-3 pt-3 border-t border-slate-800 space-y-2">
+                <div className="mt-3 pt-3 border-t border-slate-800 space-y-3">
                   <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block">
                     Initial Attachments
                   </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {ticket.attachments
-                      .filter(att => !att.responseId)
-                      .map((att) => {
-                        const sizeKB = att.fileSize ? `${(att.fileSize / 1024).toFixed(0)} KB` : "";
-                        const isImage = att.mimeType?.startsWith("image/");
-                        return (
-                          <div key={att.id} className="flex items-center justify-between p-2 rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-950 transition">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <span className={`p-1 rounded ${isImage ? "bg-blue-950/50 text-blue-400 border border-blue-900/30" : "bg-orange-950/50 text-orange-400 border border-orange-900/30"}`}>
-                                <FileText className="h-4 w-4" />
-                              </span>
-                              <div className="min-w-0 text-xs">
-                                <a 
-                                  href={att.fileUrl} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className="font-semibold text-blue-400 hover:text-blue-300 hover:underline block truncate max-w-[180px]"
-                                  title={att.fileName}
-                                >
-                                  {att.fileName}
-                                </a>
-                                {sizeKB && <span className="text-[10px] text-slate-500">{sizeKB}</span>}
+                  <div className="flex flex-col gap-3">
+                    {/* Images preview */}
+                    {ticket.attachments.filter(att => !att.responseId && att.mimeType?.startsWith("image/")).length > 0 && (
+                      <div className="flex flex-wrap gap-3">
+                        {ticket.attachments
+                          .filter(att => !att.responseId && att.mimeType?.startsWith("image/"))
+                          .map((att) => (
+                            <a 
+                              key={att.id} 
+                              href={att.fileUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="group relative block overflow-hidden rounded-lg border border-slate-800 bg-slate-950/50 hover:border-blue-500/50 transition duration-200"
+                            >
+                              <img 
+                                src={att.fileUrl} 
+                                alt={att.fileName} 
+                                className="h-28 w-auto object-cover max-w-[200px] group-hover:scale-105 transition duration-200"
+                              />
+                              <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 text-[9px] text-white truncate max-w-[200px] opacity-0 group-hover:opacity-100 transition duration-200 text-center">
+                                {att.fileName}
                               </div>
-                            </div>
-                          </div>
-                        );
-                      })}
+                            </a>
+                          ))}
+                      </div>
+                    )}
+
+                    {/* Non-images list */}
+                    {ticket.attachments.filter(att => !att.responseId && !att.mimeType?.startsWith("image/")).length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {ticket.attachments
+                          .filter(att => !att.responseId && !att.mimeType?.startsWith("image/"))
+                          .map((att) => {
+                            const sizeKB = att.fileSize ? `${(att.fileSize / 1024).toFixed(0)} KB` : "";
+                            return (
+                              <div key={att.id} className="flex items-center justify-between p-2 rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-950 transition">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <span className="p-1 rounded bg-orange-950/50 text-orange-400 border border-orange-900/30">
+                                    <FileText className="h-4 w-4" />
+                                  </span>
+                                  <div className="min-w-0 text-xs">
+                                    <a 
+                                      href={att.fileUrl} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="font-semibold text-blue-400 hover:text-blue-300 hover:underline block truncate max-w-[180px]"
+                                      title={att.fileName}
+                                    >
+                                      {att.fileName}
+                                    </a>
+                                    {sizeKB && <span className="text-[10px] text-slate-500">{sizeKB}</span>}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -284,36 +314,68 @@ export default function TicketDetailsPage() {
                     {response.message}
                   </div>
                   {response.attachments && response.attachments.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-slate-800 space-y-2">
+                    <div className="mt-3 pt-3 border-t border-slate-800 space-y-3">
                       <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block">
                         Attachments
                       </span>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {response.attachments.map((att) => {
-                          const sizeKB = att.fileSize ? `${(att.fileSize / 1024).toFixed(0)} KB` : "";
-                          const isImage = att.mimeType?.startsWith("image/");
-                          return (
-                            <div key={att.id} className="flex items-center justify-between p-2 rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-950 transition">
-                              <div className="flex items-center gap-2 min-w-0">
-                                <span className={`p-1 rounded ${isImage ? "bg-blue-950/50 text-blue-400 border border-blue-900/30" : "bg-orange-950/50 text-orange-400 border border-orange-900/30"}`}>
-                                  <FileText className="h-4 w-4" />
-                                </span>
-                                <div className="min-w-0 text-xs">
-                                  <a 
-                                    href={att.fileUrl} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
-                                    className="font-semibold text-blue-400 hover:text-blue-300 hover:underline block truncate max-w-[180px]"
-                                    title={att.fileName}
-                                  >
+                      <div className="flex flex-col gap-3">
+                        {/* Images preview */}
+                        {response.attachments.filter(att => att.mimeType?.startsWith("image/")).length > 0 && (
+                          <div className="flex flex-wrap gap-3">
+                            {response.attachments
+                              .filter(att => att.mimeType?.startsWith("image/"))
+                              .map((att) => (
+                                <a 
+                                  key={att.id} 
+                                  href={att.fileUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="group relative block overflow-hidden rounded-lg border border-slate-800 bg-slate-950/50 hover:border-blue-500/50 transition duration-200"
+                                >
+                                  <img 
+                                    src={att.fileUrl} 
+                                    alt={att.fileName} 
+                                    className="h-28 w-auto object-cover max-w-[200px] group-hover:scale-105 transition duration-200"
+                                  />
+                                  <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 text-[9px] text-white truncate max-w-[200px] opacity-0 group-hover:opacity-100 transition duration-200 text-center">
                                     {att.fileName}
-                                  </a>
-                                  {sizeKB && <span className="text-[10px] text-slate-500">{sizeKB}</span>}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
+                                  </div>
+                                </a>
+                              ))}
+                          </div>
+                        )}
+
+                        {/* Non-images list */}
+                        {response.attachments.filter(att => !att.mimeType?.startsWith("image/")).length > 0 && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {response.attachments
+                              .filter(att => !att.mimeType?.startsWith("image/"))
+                              .map((att) => {
+                                const sizeKB = att.fileSize ? `${(att.fileSize / 1024).toFixed(0)} KB` : "";
+                                return (
+                                  <div key={att.id} className="flex items-center justify-between p-2 rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-950 transition">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <span className="p-1 rounded bg-orange-950/50 text-orange-400 border border-orange-900/30">
+                                        <FileText className="h-4 w-4" />
+                                      </span>
+                                      <div className="min-w-0 text-xs">
+                                        <a 
+                                          href={att.fileUrl} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          className="font-semibold text-blue-400 hover:text-blue-300 hover:underline block truncate max-w-[180px]"
+                                          title={att.fileName}
+                                        >
+                                          {att.fileName}
+                                        </a>
+                                        {sizeKB && <span className="text-[10px] text-slate-500">{sizeKB}</span>}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
