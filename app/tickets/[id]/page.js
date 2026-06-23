@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { courierPortalApi } from "@/lib/api"
-import { getUser, logout } from "@/lib/auth"
+import { getUser, logout, getAccessToken } from "@/lib/auth"
 import { 
   ArrowLeft, Shield, Clock, AlertTriangle, Send, FileText, Check, X, Loader2, RefreshCw, LogOut 
 } from "lucide-react"
@@ -28,6 +28,26 @@ export default function TicketDetailsPage() {
   const [ticket, setTicket] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+
+  const getProxyUrl = (fileUrl) => {
+    try {
+      const url = new URL(fileUrl);
+      const path = url.searchParams.get("path");
+      const token = getAccessToken();
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3004";
+      return `${apiBase}/api/courier-portal/download?path=${encodeURIComponent(path)}&token=${encodeURIComponent(token)}`;
+    } catch (e) {
+      return fileUrl;
+    }
+  }
+
+  const getPreviewUrl = (fileUrl) => {
+    try {
+      return fileUrl.replace("/files/download", "/files/preview");
+    } catch (e) {
+      return fileUrl;
+    }
+  }
 
   // Reply state
   const [message, setMessage] = useState("")
@@ -232,22 +252,29 @@ export default function TicketDetailsPage() {
                         {ticket.attachments
                           .filter(att => !att.responseId && att.mimeType?.startsWith("image/"))
                           .map((att) => (
-                            <a 
+                            <div 
                               key={att.id} 
-                              href={att.fileUrl} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="group relative block overflow-hidden rounded-lg border border-slate-800 bg-slate-950/50 hover:border-blue-500/50 transition duration-200"
+                              className="relative group overflow-hidden rounded-lg border border-slate-800 bg-slate-950/50 hover:border-blue-500/50 transition duration-200"
                             >
                               <img 
-                                src={att.fileUrl} 
+                                src={getPreviewUrl(att.fileUrl)} 
                                 alt={att.fileName} 
-                                className="h-28 w-auto object-cover max-w-[200px] group-hover:scale-105 transition duration-200"
+                                className="h-28 w-auto object-cover max-w-[200px]"
                               />
-                              <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 text-[9px] text-white truncate max-w-[200px] opacity-0 group-hover:opacity-100 transition duration-200 text-center">
-                                {att.fileName}
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition duration-200 flex flex-col justify-between p-2">
+                                <span className="text-[9px] text-white truncate text-center block font-medium">
+                                  {att.fileName}
+                                </span>
+                                <a 
+                                  href={getProxyUrl(att.fileUrl)} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="w-full text-center bg-blue-600 hover:bg-blue-700 text-white rounded text-[10px] py-1 font-semibold block"
+                                >
+                                  Download
+                                </a>
                               </div>
-                            </a>
+                            </div>
                           ))}
                       </div>
                     )}
@@ -267,7 +294,7 @@ export default function TicketDetailsPage() {
                                   </span>
                                   <div className="min-w-0 text-xs">
                                     <a 
-                                      href={att.fileUrl} 
+                                      href={getProxyUrl(att.fileUrl)} 
                                       target="_blank" 
                                       rel="noopener noreferrer" 
                                       className="font-semibold text-blue-400 hover:text-blue-300 hover:underline block truncate max-w-[180px]"
@@ -325,22 +352,29 @@ export default function TicketDetailsPage() {
                             {response.attachments
                               .filter(att => att.mimeType?.startsWith("image/"))
                               .map((att) => (
-                                <a 
+                                <div 
                                   key={att.id} 
-                                  href={att.fileUrl} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="group relative block overflow-hidden rounded-lg border border-slate-800 bg-slate-950/50 hover:border-blue-500/50 transition duration-200"
+                                  className="relative group overflow-hidden rounded-lg border border-slate-800 bg-slate-950/50 hover:border-blue-500/50 transition duration-200"
                                 >
                                   <img 
-                                    src={att.fileUrl} 
+                                    src={getPreviewUrl(att.fileUrl)} 
                                     alt={att.fileName} 
-                                    className="h-28 w-auto object-cover max-w-[200px] group-hover:scale-105 transition duration-200"
+                                    className="h-28 w-auto object-cover max-w-[200px]"
                                   />
-                                  <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 text-[9px] text-white truncate max-w-[200px] opacity-0 group-hover:opacity-100 transition duration-200 text-center">
-                                    {att.fileName}
+                                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition duration-200 flex flex-col justify-between p-2">
+                                    <span className="text-[9px] text-white truncate text-center block font-medium">
+                                      {att.fileName}
+                                    </span>
+                                    <a 
+                                      href={getProxyUrl(att.fileUrl)} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="w-full text-center bg-blue-600 hover:bg-blue-700 text-white rounded text-[10px] py-1 font-semibold block"
+                                    >
+                                      Download
+                                    </a>
                                   </div>
-                                </a>
+                                </div>
                               ))}
                           </div>
                         )}
@@ -360,7 +394,7 @@ export default function TicketDetailsPage() {
                                       </span>
                                       <div className="min-w-0 text-xs">
                                         <a 
-                                          href={att.fileUrl} 
+                                          href={getProxyUrl(att.fileUrl)} 
                                           target="_blank" 
                                           rel="noopener noreferrer" 
                                           className="font-semibold text-blue-400 hover:text-blue-300 hover:underline block truncate max-w-[180px]"
