@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { courierPortalApi } from "@/lib/api"
 import { saveSession, getUser } from "@/lib/auth"
 import { Shield, KeyRound, Mail, Loader2, AlertCircle } from "lucide-react"
+import ThemeToggle from "@/components/ThemeToggle"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -44,24 +45,28 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12 sm:px-6 lg:px-8 text-white">
-      <div className="w-full max-w-md space-y-8 bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl relative overflow-hidden">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-12 sm:px-6 lg:px-8 text-slate-900 dark:text-white transition-colors duration-200 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+
+      <div className="w-full max-w-md space-y-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-2xl shadow-xl relative overflow-hidden transition-colors duration-200">
         {/* Glow effect */}
-        <div className="absolute -top-12 -right-12 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl" />
+        <div className="absolute -top-12 -right-12 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl" />
 
         <div className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 mb-4">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-500 dark:text-blue-400 mb-4">
             <Shield className="h-6 w-6" />
           </div>
           <h2 className="text-2xl font-bold tracking-tight">Courier Partner Desk</h2>
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Access investigations, claims, and SLAs for Nakson Group merchants.
           </p>
         </div>
 
         {error && (
-          <div className="p-3 bg-red-950/30 text-red-400 rounded-lg border border-red-900/50 text-sm flex items-center gap-2">
+          <div className="p-3 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-900/50 text-sm flex items-center gap-2">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             <span>{error}</span>
           </div>
@@ -71,9 +76,9 @@ export default function LoginPage() {
           <div className="space-y-4">
             {/* Email field */}
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Email Address</label>
+              <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email Address</label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                   <Mail className="h-4 w-4" />
                 </div>
                 <input
@@ -82,16 +87,16 @@ export default function LoginPage() {
                   placeholder="name@courier.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full rounded-lg border border-slate-800 bg-slate-950 py-2 pl-10 pr-3 text-sm placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white"
+                  className="block w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-2 pl-10 pr-3 text-sm placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 dark:text-white transition-colors duration-200"
                 />
               </div>
             </div>
 
             {/* Password field */}
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Password</label>
+              <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Password</label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                   <KeyRound className="h-4 w-4" />
                 </div>
                 <input
@@ -100,7 +105,7 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full rounded-lg border border-slate-800 bg-slate-950 py-2 pl-10 pr-3 text-sm placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white"
+                  className="block w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-2 pl-10 pr-3 text-sm placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 dark:text-white transition-colors duration-200"
                 />
               </div>
             </div>
