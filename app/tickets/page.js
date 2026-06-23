@@ -6,7 +6,7 @@ import Link from "next/link"
 import { courierPortalApi } from "@/lib/api"
 import { getUser, logout } from "@/lib/auth"
 import { 
-  LogOut, Shield, Search, RefreshCw, MessageSquare, AlertTriangle, Clock, CheckCircle, ArrowRight 
+  LogOut, Shield, Search, RefreshCw, MessageSquare, AlertTriangle, Clock, CheckCircle, ArrowRight, Settings 
 } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import ThemeToggle from "@/components/ThemeToggle"
@@ -101,111 +101,112 @@ export default function TicketsListPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200">
       {/* Header bar */}
-      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between transition-colors duration-200">
-        <div className="flex items-center space-x-3">
-          <div className="h-9 w-9 bg-blue-500/10 border border-blue-500/20 text-blue-500 dark:text-blue-400 rounded-lg flex items-center justify-center">
-            <Shield className="h-5 w-5" />
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-4 flex items-center justify-between transition-colors duration-200">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="h-8 w-8 sm:h-9 sm:w-9 bg-blue-500/10 border border-blue-500/20 text-blue-500 dark:text-blue-400 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Shield className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
-          <div>
-            <h1 className="font-bold text-base leading-none text-slate-900 dark:text-white">Courier Partner Desk</h1>
-            <span className="text-xs text-slate-500 dark:text-slate-400">{user.courierPartnerName} ({user.name})</span>
+          <div className="min-w-0">
+            <h1 className="font-bold text-sm sm:text-base leading-none text-slate-900 dark:text-white truncate">Courier Partner Desk</h1>
+            <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 block truncate mt-0.5">{user.courierPartnerName} ({user.name})</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {user.role === 'ADMIN' && (
             <Link href="/settings">
-              <button className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 transition text-xs font-semibold">
-                Settings
+              <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 transition text-xs font-semibold cursor-pointer">
+                <Settings className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Settings</span>
               </button>
             </Link>
           )}
           <ThemeToggle />
           <button 
             onClick={logout} 
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:text-red-650 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-900/50 transition duration-200 text-xs font-semibold"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-900/50 transition duration-200 text-xs font-semibold cursor-pointer"
           >
             <LogOut className="h-3.5 w-3.5" />
-            <span>Log Out</span>
+            <span className="hidden sm:inline">Log Out</span>
           </button>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Assigned Disputes & Investigations</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Review tickets raised by Nakson Group merchants for {user.courierPartnerName} deliveries.</p>
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Assigned Disputes & Investigations</h2>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Review tickets raised by Nakson Group merchants for {user.courierPartnerName} deliveries.</p>
         </div>
 
         {/* Stats Dashboard */}
         {stats && (
-          <div className="grid gap-4 grid-cols-2 md:grid-cols-5">
+          <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
             <div 
-              className={`cursor-pointer hover:border-blue-550/50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 transition duration-200 ${!status && !slaBreachedFilter && !courierStatus && !transitDuration ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
+              className={`cursor-pointer hover:border-blue-500/50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 transition duration-200 ${!status && !slaBreachedFilter && !courierStatus && !transitDuration ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
               onClick={() => { setStatus(""); setSlaBreachedFilter(false); setCourierStatus(""); setTransitDuration(""); setPage(1); }}
             >
-              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2">
                 <span>Total Assigned</span>
                 <MessageSquare className="h-4 w-4 text-slate-400 dark:text-slate-500" />
               </div>
-              <div className="text-2xl font-bold text-slate-900 dark:text-white">{stats.total}</div>
-              <p className="text-[10px] text-slate-500 mt-1">All tickets assigned to desk</p>
+              <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{stats.total}</div>
+              <p className="text-[9px] sm:text-[10px] text-slate-500 mt-0.5 sm:mt-1">All tickets assigned to desk</p>
             </div>
             
             <div 
-              className={`cursor-pointer hover:border-blue-550/50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 transition duration-200 ${status === "OPEN" ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
+              className={`cursor-pointer hover:border-blue-500/50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 transition duration-200 ${status === "OPEN" ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
               onClick={() => { setStatus("OPEN"); setSlaBreachedFilter(false); setPage(1); }}
             >
-              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2">
                 <span>Open</span>
                 <Clock className="h-4 w-4 text-blue-500 dark:text-blue-400" />
               </div>
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.open}</div>
-              <p className="text-[10px] text-slate-500 mt-1">New issues requiring response</p>
+              <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.open}</div>
+              <p className="text-[9px] sm:text-[10px] text-slate-500 mt-0.5 sm:mt-1">New issues requiring response</p>
             </div>
 
             <div 
-              className={`cursor-pointer hover:border-blue-550/50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 transition duration-200 ${status === "PENDING_COURIER" ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
+              className={`cursor-pointer hover:border-blue-500/50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 transition duration-200 ${status === "PENDING_COURIER" ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
               onClick={() => { setStatus("PENDING_COURIER"); setSlaBreachedFilter(false); setPage(1); }}
             >
-              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2">
                 <span>Action Required</span>
                 <Clock className="h-4 w-4 text-orange-500 dark:text-orange-400" />
               </div>
-              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.pendingCourier}</div>
-              <p className="text-[10px] text-slate-500 mt-1">Awaiting courier action</p>
+              <div className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.pendingCourier}</div>
+              <p className="text-[9px] sm:text-[10px] text-slate-500 mt-0.5 sm:mt-1">Awaiting courier action</p>
             </div>
 
             <div 
-              className={`cursor-pointer hover:border-blue-550/50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 transition duration-200 ${status === "PENDING_COMPANY" ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
+              className={`cursor-pointer hover:border-blue-500/50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 transition duration-200 ${status === "PENDING_COMPANY" ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
               onClick={() => { setStatus("PENDING_COMPANY"); setSlaBreachedFilter(false); setPage(1); }}
             >
-              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2">
                 <span>Pending Merchant</span>
-                <Clock className="h-4 w-4 text-purple-550 dark:text-purple-400" />
+                <Clock className="h-4 w-4 text-purple-500 dark:text-purple-400" />
               </div>
-              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.pendingCompany}</div>
-              <p className="text-[10px] text-slate-500 mt-1">Awaiting merchant reply</p>
+              <div className="text-xl sm:text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.pendingCompany}</div>
+              <p className="text-[9px] sm:text-[10px] text-slate-500 mt-0.5 sm:mt-1">Awaiting merchant reply</p>
             </div>
 
             <div 
-              className={`cursor-pointer hover:border-red-500/50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 transition duration-200 col-span-2 md:col-span-1 ${slaBreachedFilter ? "border-red-500 ring-1 ring-red-500/50" : ""}`}
+              className={`cursor-pointer hover:border-red-500/50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 transition duration-200 col-span-2 sm:col-span-1 ${slaBreachedFilter ? "border-red-500 ring-1 ring-red-500/50" : ""}`}
               onClick={() => { setStatus(""); setSlaBreachedFilter(true); setPage(1); }}
             >
-              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2">
                 <span>SLA Breached</span>
                 <AlertTriangle className="h-4 w-4 text-red-500 animate-pulse" />
               </div>
-              <div className="text-2xl font-bold text-red-500">{stats.resolutionBreached}</div>
-              <p className="text-[10px] text-red-550 dark:text-red-400/80 font-semibold mt-1">Resolution SLA missed</p>
+              <div className="text-xl sm:text-2xl font-bold text-red-500">{stats.resolutionBreached}</div>
+              <p className="text-[9px] sm:text-[10px] text-red-500 dark:text-red-400/80 font-semibold mt-0.5 sm:mt-1">Resolution SLA missed</p>
             </div>
           </div>
         )}
 
         {/* Filter bar */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl transition-colors duration-200">
-          <form onSubmit={handleSearchSubmit} className="flex flex-1 items-center space-x-2 max-w-md">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl transition-colors duration-200">
+          <form onSubmit={handleSearchSubmit} className="flex items-center space-x-2 w-full lg:max-w-md">
             <div className="relative w-full">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
               <input
@@ -221,11 +222,11 @@ export default function TicketsListPage() {
             </button>
           </form>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
             <select
               value={status}
               onChange={(e) => { setStatus(e.target.value); setSlaBreachedFilter(false); setPage(1); }}
-              className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
+              className="flex-1 lg:flex-initial bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 cursor-pointer"
             >
               <option value="">All Statuses</option>
               {Object.entries(STATUS_CONFIGS).map(([key, config]) => (
@@ -236,7 +237,7 @@ export default function TicketsListPage() {
             <select
               value={courierStatus}
               onChange={(e) => { setCourierStatus(e.target.value); setPage(1); }}
-              className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
+              className="flex-1 lg:flex-initial bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 cursor-pointer"
             >
               <option value="">All Courier Statuses</option>
               <option value="PICKED_UP">Picked Up</option>
@@ -251,7 +252,7 @@ export default function TicketsListPage() {
             <select
               value={transitDuration}
               onChange={(e) => { setTransitDuration(e.target.value); setPage(1); }}
-              className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
+              className="flex-1 lg:flex-initial bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 cursor-pointer"
             >
               <option value="">Any Transit Time</option>
               <option value="12">Over 12 Hours</option>
@@ -284,97 +285,172 @@ export default function TicketsListPage() {
               <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs">No active investigations have been assigned to your portal account.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 font-semibold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
-                    <th className="p-4">Ticket</th>
-                    <th className="p-4">Reference Info</th>
-                    <th className="p-4">Issue Type</th>
-                    <th className="p-4">Status</th>
-                    <th className="p-4">Courier Status</th>
-                    <th className="p-4">Priority</th>
-                    <th className="p-4">SLA status</th>
-                    <th className="p-4 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
-                  {tickets.map((ticket) => {
-                    const statusConfig = STATUS_CONFIGS[ticket.currentStatus] || {}
-                    const priorityConfig = PRIORITY_CONFIGS[ticket.priority] || {}
-                    const timeAgo = formatDistanceToNow(new Date(ticket.createdAt), { addSuffix: true })
-                    
-                    const isResolutionBreached = ticket.resolutionBreached || (ticket.resolutionDeadline && new Date() > new Date(ticket.resolutionDeadline) && ticket.currentStatus !== 'RESOLVED' && ticket.currentStatus !== 'CLOSED');
+            <>
+              {/* Desktop Table View */}
+              <div className="overflow-x-auto hidden md:block">
+                <table className="w-full border-collapse text-left">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 font-semibold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
+                      <th className="p-4">Ticket</th>
+                      <th className="p-4">Reference Info</th>
+                      <th className="p-4">Issue Type</th>
+                      <th className="p-4">Status</th>
+                      <th className="p-4">Courier Status</th>
+                      <th className="p-4">Priority</th>
+                      <th className="p-4">SLA status</th>
+                      <th className="p-4 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
+                    {tickets.map((ticket) => {
+                      const statusConfig = STATUS_CONFIGS[ticket.currentStatus] || {}
+                      const priorityConfig = PRIORITY_CONFIGS[ticket.priority] || {}
+                      const timeAgo = formatDistanceToNow(new Date(ticket.createdAt), { addSuffix: true })
+                      
+                      const isResolutionBreached = ticket.resolutionBreached || (ticket.resolutionDeadline && new Date() > new Date(ticket.resolutionDeadline) && ticket.currentStatus !== 'RESOLVED' && ticket.currentStatus !== 'CLOSED');
 
-                    return (
-                      <tr key={ticket.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition duration-150">
-                        <td className="p-4">
-                          <Link href={`/tickets/${ticket.id}`} className="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 hover:underline">
-                            {ticket.ticketNumber}
-                          </Link>
-                          <div className="text-xs text-slate-500 mt-1">Created {timeAgo}</div>
-                        </td>
-                        <td className="p-4">
-                          <div className="font-medium text-slate-900 dark:text-white">Tracking: {ticket.trackingNumber}</div>
-                          {ticket.orderReference && (
-                            <div className="text-xs text-slate-500 mt-0.5">Order Ref: {ticket.orderReference}</div>
-                          )}
-                        </td>
-                        <td className="p-4 font-medium text-slate-850 dark:text-slate-200">
-                          {ticket.issueType.name}
-                        </td>
-                        <td className="p-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border ${statusConfig.color}`}>
-                            {statusConfig.label}
+                      return (
+                        <tr key={ticket.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition duration-150">
+                          <td className="p-4">
+                            <Link href={`/tickets/${ticket.id}`} className="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 hover:underline">
+                              {ticket.ticketNumber}
+                            </Link>
+                            <div className="text-xs text-slate-500 mt-1">Created {timeAgo}</div>
+                          </td>
+                          <td className="p-4">
+                            <div className="font-medium text-slate-900 dark:text-white">Tracking: {ticket.trackingNumber}</div>
+                            {ticket.orderReference && (
+                              <div className="text-xs text-slate-500 mt-0.5">Order Ref: {ticket.orderReference}</div>
+                            )}
+                          </td>
+                          <td className="p-4 font-medium text-slate-850 dark:text-slate-200">
+                            {ticket.issueType.name}
+                          </td>
+                          <td className="p-4">
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border ${statusConfig.color}`}>
+                              {statusConfig.label}
+                            </span>
+                          </td>
+                          <td className="p-4">
+                            {ticket.courierStatus ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300">
+                                {ticket.courierStatus}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400 text-xs">—</span>
+                            )}
+                            {ticket.transitDuration !== null && ticket.transitDuration !== undefined && (
+                              <div className="text-[10px] text-slate-500 mt-1">
+                                Duration: {Number(ticket.transitDuration).toFixed(1)} hrs
+                              </div>
+                            )}
+                          </td>
+                          <td className="p-4">
+                            <span className={`inline-flex items-center text-xs font-semibold ${priorityConfig.color}`}>
+                              {priorityConfig.label}
+                            </span>
+                          </td>
+                          <td className="p-4">
+                            {isResolutionBreached ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-650 dark:text-red-400 border border-red-200 dark:border-red-900/30 text-xs font-semibold gap-1">
+                                <AlertTriangle className="h-3 w-3" /> SLA Breached
+                              </span>
+                            ) : ticket.currentStatus === 'RESOLVED' || ticket.currentStatus === 'CLOSED' ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-650 dark:text-emerald-400 border border-emerald-250/30 dark:border-emerald-900/30 text-xs font-semibold gap-1">
+                                <CheckCircle className="h-3 w-3" /> Resolved
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center text-xs text-slate-500 dark:text-slate-400 font-semibold gap-1">
+                                <Clock className="h-3 w-3 text-blue-500 animate-pulse" /> Active
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-4 text-right">
+                            <Link href={`/tickets/${ticket.id}`}>
+                              <button className="text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition duration-200 cursor-pointer">
+                                <ArrowRight className="h-4 w-4" />
+                              </button>
+                            </Link>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card List View */}
+              <div className="block md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+                {tickets.map((ticket) => {
+                  const statusConfig = STATUS_CONFIGS[ticket.currentStatus] || {}
+                  const priorityConfig = PRIORITY_CONFIGS[ticket.priority] || {}
+                  const timeAgo = formatDistanceToNow(new Date(ticket.createdAt), { addSuffix: true })
+                  const isResolutionBreached = ticket.resolutionBreached || (ticket.resolutionDeadline && new Date() > new Date(ticket.resolutionDeadline) && ticket.currentStatus !== 'RESOLVED' && ticket.currentStatus !== 'CLOSED');
+
+                  return (
+                    <div key={ticket.id} className="p-4 space-y-3 hover:bg-slate-50 dark:hover:bg-slate-800/10 transition">
+                      <div className="flex items-center justify-between">
+                        <Link href={`/tickets/${ticket.id}`} className="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-500 hover:underline text-sm">
+                          {ticket.ticketNumber}
+                        </Link>
+                        <span className="text-[10px] text-slate-500">{timeAgo}</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <span className="text-slate-500 dark:text-slate-400 block text-[10px] uppercase font-semibold">Tracking Number</span>
+                          <span className="font-semibold text-slate-900 dark:text-white mt-0.5 block">{ticket.trackingNumber}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500 dark:text-slate-400 block text-[10px] uppercase font-semibold">Order Reference</span>
+                          <span className="font-semibold text-slate-900 dark:text-white mt-0.5 block">{ticket.orderReference || "—"}</span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <span className="text-slate-500 dark:text-slate-400 block text-[10px] uppercase font-semibold">Issue Type</span>
+                          <span className="font-medium text-slate-800 dark:text-slate-200 mt-0.5 block">{ticket.issueType.name}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500 dark:text-slate-400 block text-[10px] uppercase font-semibold">Priority</span>
+                          <span className={`font-semibold mt-0.5 block ${priorityConfig.color}`}>{priorityConfig.label}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/50">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold border ${statusConfig.color}`}>
+                          {statusConfig.label}
+                        </span>
+                        {ticket.courierStatus && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300">
+                            {ticket.courierStatus}
                           </span>
-                        </td>
-                        <td className="p-4">
-                          {ticket.courierStatus ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300">
-                              {ticket.courierStatus}
-                            </span>
-                          ) : (
-                            <span className="text-slate-400 text-xs">—</span>
-                          )}
-                          {ticket.transitDuration !== null && ticket.transitDuration !== undefined && (
-                            <div className="text-[10px] text-slate-500 mt-1">
-                              Duration: {Number(ticket.transitDuration).toFixed(1)} hrs
-                            </div>
-                          )}
-                        </td>
-                        <td className="p-4">
-                          <span className={`inline-flex items-center text-xs font-semibold ${priorityConfig.color}`}>
-                            {priorityConfig.label}
+                        )}
+                        {ticket.transitDuration !== null && ticket.transitDuration !== undefined && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-500">
+                            {Number(ticket.transitDuration).toFixed(1)} hrs
                           </span>
-                        </td>
-                        <td className="p-4">
-                          {isResolutionBreached ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-650 dark:text-red-400 border border-red-200 dark:border-red-900/30 text-xs font-semibold gap-1">
-                              <AlertTriangle className="h-3 w-3" /> SLA Breached
-                            </span>
-                          ) : ticket.currentStatus === 'RESOLVED' || ticket.currentStatus === 'CLOSED' ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-650 dark:text-emerald-400 border border-emerald-250/30 dark:border-emerald-900/30 text-xs font-semibold gap-1">
-                              <CheckCircle className="h-3 w-3" /> Resolved
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center text-xs text-slate-500 dark:text-slate-400 font-semibold gap-1">
-                              <Clock className="h-3 w-3 text-blue-500 animate-pulse" /> Active
-                            </span>
-                          )}
-                        </td>
-                        <td className="p-4 text-right">
-                          <Link href={`/tickets/${ticket.id}`}>
-                            <button className="text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition duration-200 cursor-pointer">
-                              <ArrowRight className="h-4 w-4" />
-                            </button>
-                          </Link>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+                        )}
+                        {isResolutionBreached ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-650 dark:text-red-400 border border-red-200 dark:border-red-900/30 text-[10px] font-semibold gap-1">
+                            <AlertTriangle className="h-3 w-3" /> SLA Breached
+                          </span>
+                        ) : ticket.currentStatus === 'RESOLVED' || ticket.currentStatus === 'CLOSED' ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-650 dark:text-emerald-400 border border-emerald-250/30 dark:border-emerald-900/30 text-[10px] font-semibold gap-1">
+                            <CheckCircle className="h-3 w-3" /> Resolved
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center text-[10px] text-slate-500 dark:text-slate-400 font-semibold gap-1">
+                            <Clock className="h-3 w-3 text-blue-500 animate-pulse" /> Active
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
           )}
         </div>
 

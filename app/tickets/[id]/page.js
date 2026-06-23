@@ -6,7 +6,7 @@ import Link from "next/link"
 import { courierPortalApi } from "@/lib/api"
 import { getUser, logout, getAccessToken } from "@/lib/auth"
 import { 
-  ArrowLeft, Shield, Clock, AlertTriangle, Send, FileText, Check, X, Loader2, RefreshCw, LogOut 
+  ArrowLeft, Shield, Clock, AlertTriangle, Send, FileText, Check, X, Loader2, RefreshCw, LogOut, Settings 
 } from "lucide-react"
 import { formatDistanceToNow, format } from "date-fns"
 import ThemeToggle from "@/components/ThemeToggle"
@@ -199,40 +199,44 @@ export default function TicketDetailsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200">
-      {/* Header bar */}
-      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between transition-colors duration-200">
-        <div className="flex items-center space-x-3">
-          <Link href="/tickets">
-            <button className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-          </Link>
-          <span className="font-bold text-slate-900 dark:text-white text-lg">{ticket.ticketNumber}</span>
-          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border ${statusConfig.color}`}>
-            {statusConfig.label}
-          </span>
-          {isResolutionBreached && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-650 dark:text-red-400 border border-red-200 dark:border-red-900/30 text-xs font-semibold gap-1">
-              <AlertTriangle className="h-3 w-3" /> SLA Breached
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-4 flex items-center justify-between transition-colors duration-200">
+        <div className="flex flex-col md:flex-row md:items-center gap-2 min-w-0">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <Link href="/tickets">
+              <button className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+            </Link>
+            <span className="font-bold text-slate-900 dark:text-white text-base sm:text-lg truncate">{ticket.ticketNumber}</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 pl-9 md:pl-0">
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-semibold border ${statusConfig.color}`}>
+              {statusConfig.label}
             </span>
-          )}
+            {isResolutionBreached && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/30 text-[10px] sm:text-xs font-semibold gap-1">
+                <AlertTriangle className="h-3 w-3" /> SLA Breached
+              </span>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
           {user.role === 'ADMIN' && (
             <Link href="/settings">
-              <button className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 transition text-xs font-semibold">
-                Settings
+              <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 transition text-xs font-semibold cursor-pointer">
+                <Settings className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Settings</span>
               </button>
             </Link>
           )}
           <ThemeToggle />
           <button 
             onClick={logout} 
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-655 dark:text-slate-400 hover:text-red-650 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-900/50 transition duration-200 text-xs font-semibold cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:text-red-650 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-900/50 transition duration-200 text-xs font-semibold cursor-pointer"
           >
             <LogOut className="h-3.5 w-3.5" />
-            <span>Log Out</span>
+            <span className="hidden sm:inline">Log Out</span>
           </button>
         </div>
       </header>
