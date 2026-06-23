@@ -35,6 +35,8 @@ export default function TicketsListPage() {
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState(null)
   const [slaBreachedFilter, setSlaBreachedFilter] = useState(false)
+  const [courierStatus, setCourierStatus] = useState("")
+  const [transitDuration, setTransitDuration] = useState("")
   
   // Filters
   const [status, setStatus] = useState("")
@@ -61,6 +63,8 @@ export default function TicketsListPage() {
       if (status) params.status = status
       if (search) params.search = search
       if (slaBreachedFilter) params.slaBreached = "true"
+      if (courierStatus) params.courierStatus = courierStatus
+      if (transitDuration) params.transitDuration = transitDuration
 
       const res = await courierPortalApi.getTickets(params)
       if (res && res.tickets) {
@@ -83,7 +87,7 @@ export default function TicketsListPage() {
     if (user) {
       fetchTickets()
     }
-  }, [user, page, status, slaBreachedFilter])
+  }, [user, page, status, slaBreachedFilter, courierStatus, transitDuration])
 
   const handleSearchSubmit = (e) => {
     e.preventDefault()
@@ -127,8 +131,8 @@ export default function TicketsListPage() {
         {stats && (
           <div className="grid gap-4 grid-cols-2 md:grid-cols-5">
             <div 
-              className={`cursor-pointer hover:border-blue-500/50 bg-slate-900 border border-slate-800 rounded-xl p-4 transition duration-200 ${!status && !slaBreachedFilter ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
-              onClick={() => { setStatus(""); setSlaBreachedFilter(false); setPage(1); }}
+              className={`cursor-pointer hover:border-blue-500/50 bg-slate-900 border border-slate-800 rounded-xl p-4 transition duration-200 ${!status && !slaBreachedFilter && !courierStatus && !transitDuration ? "border-blue-500 ring-1 ring-blue-500/50" : ""}`}
+              onClick={() => { setStatus(""); setSlaBreachedFilter(false); setCourierStatus(""); setTransitDuration(""); setPage(1); }}
             >
               <div className="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
                 <span>Total Assigned</span>
@@ -218,6 +222,33 @@ export default function TicketsListPage() {
               ))}
             </select>
 
+            <select
+              value={courierStatus}
+              onChange={(e) => { setCourierStatus(e.target.value); setPage(1); }}
+              className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Courier Statuses</option>
+              <option value="PICKED_UP">Picked Up</option>
+              <option value="IN_TRANSIT">In Transit</option>
+              <option value="AT_STATION">At Station</option>
+              <option value="ASSIGNED">Assigned</option>
+              <option value="DELIVERED">Delivered</option>
+              <option value="RETURNED">Returned</option>
+              <option value="FAILED">Failed</option>
+            </select>
+
+            <select
+              value={transitDuration}
+              onChange={(e) => { setTransitDuration(e.target.value); setPage(1); }}
+              className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Any Transit Time</option>
+              <option value="12">Over 12 Hours</option>
+              <option value="24">Over 24 Hours</option>
+              <option value="48">Over 48 Hours</option>
+              <option value="72">Over 72 Hours</option>
+            </select>
+
             <button 
               onClick={fetchTickets} 
               className="border border-slate-800 bg-slate-950 hover:bg-slate-900 p-2 rounded-lg text-slate-400 transition"
@@ -250,6 +281,7 @@ export default function TicketsListPage() {
                     <th className="p-4">Reference Info</th>
                     <th className="p-4">Issue Type</th>
                     <th className="p-4">Status</th>
+                    <th className="p-4">Courier Status</th>
                     <th className="p-4">Priority</th>
                     <th className="p-4">SLA status</th>
                     <th className="p-4 text-right">Action</th>
@@ -284,6 +316,20 @@ export default function TicketsListPage() {
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border ${statusConfig.color}`}>
                             {statusConfig.label}
                           </span>
+                        </td>
+                        <td className="p-4">
+                          {ticket.courierStatus ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border border-slate-800 bg-slate-950 text-slate-300">
+                              {ticket.courierStatus}
+                            </span>
+                          ) : (
+                            <span className="text-slate-600 text-xs">—</span>
+                          )}
+                          {ticket.transitDuration !== null && ticket.transitDuration !== undefined && (
+                            <div className="text-[10px] text-slate-500 mt-1">
+                              Duration: {Number(ticket.transitDuration).toFixed(1)} hrs
+                            </div>
+                          )}
                         </td>
                         <td className="p-4">
                           <span className={`inline-flex items-center text-xs font-semibold ${priorityConfig.color}`}>

@@ -353,7 +353,7 @@ export default function TicketDetailsPage() {
                 Live Courier Status
               </h3>
               
-              <div className="grid grid-cols-2 gap-2 border-b border-slate-800 pb-3">
+              <div className="grid grid-cols-3 gap-2 border-b border-slate-800 pb-3">
                 <div>
                   <span className="text-[10px] text-slate-500 block uppercase tracking-wider">Live Status</span>
                   <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase mt-1">
@@ -364,6 +364,14 @@ export default function TicketDetailsPage() {
                   <span className="text-[10px] text-slate-500 block uppercase tracking-wider">Courier Code</span>
                   <span className="font-bold text-slate-300 text-xs block mt-1">
                     {ticket.liveTracking.courier}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 block uppercase tracking-wider">Transit Time</span>
+                  <span className="font-bold text-slate-300 text-xs block mt-1">
+                    {ticket.liveTracking.duration_hour !== null && ticket.liveTracking.duration_hour !== undefined
+                      ? `${Number(ticket.liveTracking.duration_hour).toFixed(1)} hrs`
+                      : "N/A"}
                   </span>
                 </div>
               </div>
