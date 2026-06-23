@@ -217,9 +217,45 @@ export default function TicketDetailsPage() {
                 <span className="font-semibold text-slate-300">Merchant Staff ({ticket.creator.first_name})</span>
                 <span>{format(new Date(ticket.createdAt), "PPpp")}</span>
               </div>
-              <div className="text-sm whitespace-pre-line text-slate-200">
+              <div className="text-sm whitespace-pre-line text-slate-200 mb-3">
                 {ticket.customerRemarks}
               </div>
+              {ticket.attachments && ticket.attachments.filter(att => !att.responseId).length > 0 && (
+                <div className="mt-3 pt-3 border-t border-slate-800 space-y-2">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block">
+                    Initial Attachments
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {ticket.attachments
+                      .filter(att => !att.responseId)
+                      .map((att) => {
+                        const sizeKB = att.fileSize ? `${(att.fileSize / 1024).toFixed(0)} KB` : "";
+                        const isImage = att.mimeType?.startsWith("image/");
+                        return (
+                          <div key={att.id} className="flex items-center justify-between p-2 rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-950 transition">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className={`p-1 rounded ${isImage ? "bg-blue-950/50 text-blue-400 border border-blue-900/30" : "bg-orange-950/50 text-orange-400 border border-orange-900/30"}`}>
+                                <FileText className="h-4 w-4" />
+                              </span>
+                              <div className="min-w-0 text-xs">
+                                <a 
+                                  href={att.fileUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="font-semibold text-blue-400 hover:text-blue-300 hover:underline block truncate max-w-[180px]"
+                                  title={att.fileName}
+                                >
+                                  {att.fileName}
+                                </a>
+                                {sizeKB && <span className="text-[10px] text-slate-500">{sizeKB}</span>}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Conversation Thread */}
@@ -244,9 +280,43 @@ export default function TicketDetailsPage() {
                     <span className="font-semibold text-slate-300">{authorName}</span>
                     <span>{dateStr}</span>
                   </div>
-                  <div className="whitespace-pre-line text-slate-200">
+                  <div className="whitespace-pre-line text-slate-200 mb-3">
                     {response.message}
                   </div>
+                  {response.attachments && response.attachments.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-slate-800 space-y-2">
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block">
+                        Attachments
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {response.attachments.map((att) => {
+                          const sizeKB = att.fileSize ? `${(att.fileSize / 1024).toFixed(0)} KB` : "";
+                          const isImage = att.mimeType?.startsWith("image/");
+                          return (
+                            <div key={att.id} className="flex items-center justify-between p-2 rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-950 transition">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className={`p-1 rounded ${isImage ? "bg-blue-950/50 text-blue-400 border border-blue-900/30" : "bg-orange-950/50 text-orange-400 border border-orange-900/30"}`}>
+                                  <FileText className="h-4 w-4" />
+                                </span>
+                                <div className="min-w-0 text-xs">
+                                  <a 
+                                    href={att.fileUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="font-semibold text-blue-400 hover:text-blue-300 hover:underline block truncate max-w-[180px]"
+                                    title={att.fileName}
+                                  >
+                                    {att.fileName}
+                                  </a>
+                                  {sizeKB && <span className="text-[10px] text-slate-500">{sizeKB}</span>}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )
             })}
@@ -449,48 +519,7 @@ export default function TicketDetailsPage() {
             </div>
           )}
 
-          {/* Attachments Card */}
-          {ticket.attachments && ticket.attachments.length > 0 && (
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-              <h3 className="font-bold text-white text-base flex items-center gap-1.5">
-                <FileText className="h-4 w-4 text-blue-500" />
-                Attachments ({ticket.attachments.length})
-              </h3>
-              <div className="space-y-3">
-                {ticket.attachments.map((att) => {
-                  const sizeKB = att.fileSize ? `${(att.fileSize / 1024).toFixed(0)} KB` : "";
-                  const isImage = att.mimeType?.startsWith("image/");
-                  return (
-                    <div key={att.id} className="flex items-center justify-between p-2 rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-950 transition">
-                      <div className="flex items-center gap-2 min-w-0">
-                        {isImage ? (
-                          <span className="p-1 bg-blue-950/50 text-blue-400 border border-blue-900/30 rounded">
-                            <FileText className="h-4 w-4" />
-                          </span>
-                        ) : (
-                          <span className="p-1 bg-orange-950/50 text-orange-400 border border-orange-900/30 rounded">
-                            <FileText className="h-4 w-4" />
-                          </span>
-                        )}
-                        <div className="min-w-0 text-xs">
-                          <a 
-                            href={att.fileUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="font-semibold text-blue-400 hover:text-blue-300 hover:underline block truncate max-w-[150px]"
-                            title={att.fileName}
-                          >
-                            {att.fileName}
-                          </a>
-                          {sizeKB && <span className="text-[10px] text-slate-500">{sizeKB}</span>}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+
         </div>
       </main>
     </div>
