@@ -6,7 +6,7 @@ import Link from "next/link"
 import { courierPortalApi } from "@/lib/api"
 import { getUser, logout } from "@/lib/auth"
 import { 
-  LogOut, Shield, Search, RefreshCw, MessageSquare, AlertTriangle, Clock, CheckCircle, ArrowRight, Settings 
+  LogOut, Shield, Search, RefreshCw, MessageSquare, AlertTriangle, Clock, CheckCircle, ArrowRight, Settings, Download, Loader2 
 } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import ThemeToggle from "@/components/ThemeToggle"
@@ -42,8 +42,11 @@ export default function TicketsListPage() {
   // Filters
   const [status, setStatus] = useState("")
   const [search, setSearch] = useState("")
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [exporting, setExporting] = useState(false)
 
   useEffect(() => {
     const activeUser = getUser()
@@ -66,6 +69,8 @@ export default function TicketsListPage() {
       if (slaBreachedFilter) params.slaBreached = "true"
       if (courierStatus) params.courierStatus = courierStatus
       if (transitDuration) params.transitDuration = transitDuration
+      if (startDate) params.startDate = startDate
+      if (endDate) params.endDate = endDate
 
       const res = await courierPortalApi.getTickets(params)
       if (res && res.tickets) {
@@ -84,11 +89,78 @@ export default function TicketsListPage() {
     }
   }
 
+  const handleExport = async () => {
+    try {
+      setExporting(true)
+      const params = {
+        page: 1,
+        limit: 5000
+      }
+      if (status) params.status = status
+      if (search) params.search = search
+      if (slaBreachedFilter) params.slaBreached = "true"
+      if (courierStatus) params.courierStatus = courierStatus
+      if (transitDuration) params.transitDuration = transitDuration
+      if (startDate) params.startDate = startDate
+      if (endDate) params.endDate = endDate
+
+      const res = await courierPortalApi.getTickets(params)
+      if (!res.tickets || res.tickets.length === 0) {
+        alert("No disputes found to export.")
+        return
+      }
+
+      const headers = ["Ticket Number", "Tracking Number", "Order Ref", "Issue Type", "Status", "Courier Status", "Priority", "SLA Status", "Created At"];
+      const rows = res.tickets.map(t => {
+        let slaStatusText = "Active"
+        const isResolutionBreached = t.resolutionBreached || (t.resolutionDeadline && new Date() > new Date(t.resolutionDeadline) && t.currentStatus !== 'RESOLVED' && t.currentStatus !== 'CLOSED');
+        if (isResolutionBreached) {
+          slaStatusText = "SLA Breached"
+        } else if (t.currentStatus === 'RESOLVED' || t.currentStatus === 'CLOSED') {
+          slaStatusText = "Resolved"
+        }
+
+        return [
+          t.ticketNumber,
+          t.trackingNumber,
+          t.orderReference || "",
+          t.issueType?.name || "",
+          t.currentStatus,
+          t.courierStatus || "",
+          t.priority,
+          slaStatusText,
+          new Date(t.createdAt).toLocaleString()
+        ]
+      });
+
+      const csvContent = [headers, ...rows]
+        .map(e => e.map(val => `"${val.toString().replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      
+      const timestamp = new Date().toISOString().split("T")[0]
+      link.setAttribute("download", `tickets_export_${timestamp}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("Failed to export disputes:", err)
+      alert("Error exporting disputes.")
+    } finally {
+      setExporting(false)
+    }
+  }
+
   useEffect(() => {
     if (user) {
       fetchTickets()
     }
-  }, [user, page, status, slaBreachedFilter, courierStatus, transitDuration])
+  }, [user, page, status, slaBreachedFilter, courierStatus, transitDuration, startDate, endDate])
 
   const handleSearchSubmit = (e) => {
     e.preventDefault()
@@ -261,12 +333,44 @@ export default function TicketsListPage() {
               <option value="72">Over 72 Hours</option>
             </select>
 
+            <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs sm:text-sm">
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
+                className="bg-transparent border-none text-xs sm:text-sm focus:outline-none cursor-pointer text-slate-700 dark:text-slate-300"
+                title="Start Date"
+              />
+              <span className="text-slate-400 dark:text-slate-650 text-xs">to</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
+                className="bg-transparent border-none text-xs sm:text-sm focus:outline-none cursor-pointer text-slate-700 dark:text-slate-300"
+                title="End Date"
+              />
+            </div>
+
             <button 
               onClick={fetchTickets} 
               className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-900 p-2 rounded-lg text-slate-500 dark:text-slate-400 transition cursor-pointer"
               title="Refresh list"
             >
               <RefreshCw className="h-4 w-4" />
+            </button>
+
+            <button 
+              onClick={handleExport} 
+              disabled={exporting}
+              className="flex items-center gap-1.5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 hover:bg-slate-100 dark:hover:bg-slate-900 px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 transition duration-200 cursor-pointer disabled:opacity-50"
+              title="Export filtered disputes to CSV"
+            >
+              {exporting ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Download className="h-3.5 w-3.5" />
+              )}
+              <span>Export CSV</span>
             </button>
           </div>
         </div>

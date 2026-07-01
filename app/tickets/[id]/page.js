@@ -294,11 +294,33 @@ export default function TicketDetailsPage() {
                       </div>
                     )}
 
-                    {/* Non-images list */}
-                    {ticket.attachments.filter(att => !att.responseId && !att.mimeType?.startsWith("image/")).length > 0 && (
+                    {/* Audio attachments */}
+                    {ticket.attachments.filter(att => !att.responseId && (att.mimeType?.startsWith("audio/") || att.fileName?.toLowerCase().endsWith(".mp3"))).length > 0 && (
+                      <div className="space-y-2">
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block">
+                          Voice Messages / Audio
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {ticket.attachments
+                            .filter(att => !att.responseId && (att.mimeType?.startsWith("audio/") || att.fileName?.toLowerCase().endsWith(".mp3")))
+                            .map((att) => (
+                              <div key={att.id} className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-955/50 hover:bg-slate-100 dark:hover:bg-slate-950 transition space-y-2">
+                                <div className="flex items-center justify-between text-xs min-w-0 gap-2">
+                                  <span className="font-semibold truncate text-slate-900 dark:text-white" title={att.fileName}>{att.fileName}</span>
+                                  <a href={getProxyUrl(att.fileUrl)} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline flex-shrink-0 text-[10px]">Download</a>
+                                </div>
+                                <audio src={getProxyUrl(att.fileUrl)} controls className="w-full h-8" />
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Non-images/non-audio list */}
+                    {ticket.attachments.filter(att => !att.responseId && !att.mimeType?.startsWith("image/") && !att.mimeType?.startsWith("audio/") && !att.fileName?.toLowerCase().endsWith(".mp3")).length > 0 && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {ticket.attachments
-                          .filter(att => !att.responseId && !att.mimeType?.startsWith("image/"))
+                          .filter(att => !att.responseId && !att.mimeType?.startsWith("image/") && !att.mimeType?.startsWith("audio/") && !att.fileName?.toLowerCase().endsWith(".mp3"))
                           .map((att) => {
                             const sizeKB = att.fileSize ? `${(att.fileSize / 1024).toFixed(0)} KB` : "";
                             return (
@@ -394,15 +416,37 @@ export default function TicketDetailsPage() {
                           </div>
                         )}
 
-                        {/* Non-images list */}
-                        {response.attachments.filter(att => !att.mimeType?.startsWith("image/")).length > 0 && (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {/* Audio attachments */}
+                        {response.attachments.filter(att => (att.mimeType?.startsWith("audio/") || att.fileName?.toLowerCase().endsWith(".mp3"))).length > 0 && (
+                          <div className="space-y-2 mt-2">
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block">
+                              Voice Messages / Audio
+                            </span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {response.attachments
+                                .filter(att => (att.mimeType?.startsWith("audio/") || att.fileName?.toLowerCase().endsWith(".mp3")))
+                                .map((att) => (
+                                  <div key={att.id} className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-955/50 hover:bg-slate-100 transition space-y-2">
+                                    <div className="flex items-center justify-between text-xs min-w-0 gap-2">
+                                      <span className="font-semibold truncate text-slate-900 dark:text-white" title={att.fileName}>{att.fileName}</span>
+                                      <a href={getProxyUrl(att.fileUrl)} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline flex-shrink-0 text-[10px]">Download</a>
+                                    </div>
+                                    <audio src={getProxyUrl(att.fileUrl)} controls className="w-full h-8" />
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Non-images/non-audio list */}
+                        {response.attachments.filter(att => !att.mimeType?.startsWith("image/") && !att.mimeType?.startsWith("audio/") && !att.fileName?.toLowerCase().endsWith(".mp3")).length > 0 && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                             {response.attachments
-                              .filter(att => !att.mimeType?.startsWith("image/"))
+                              .filter(att => !att.mimeType?.startsWith("image/") && !att.mimeType?.startsWith("audio/") && !att.fileName?.toLowerCase().endsWith(".mp3"))
                               .map((att) => {
                                 const sizeKB = att.fileSize ? `${(att.fileSize / 1024).toFixed(0)} KB` : "";
                                 return (
-                                  <div key={att.id} className="flex items-center justify-between p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 hover:bg-slate-100 transition">
+                                  <div key={att.id} className="flex items-center justify-between p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-955/50 hover:bg-slate-100 transition">
                                     <div className="flex items-center gap-2 min-w-0">
                                       <span className="p-1 rounded bg-orange-100 dark:bg-orange-950/50 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-900/30">
                                         <FileText className="h-4 w-4" />

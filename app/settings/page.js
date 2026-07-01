@@ -6,7 +6,7 @@ import Link from "next/link"
 import { getUser, logout } from "@/lib/auth"
 import { courierPortalApi } from "@/lib/api"
 import { 
-  LogOut, ArrowLeft, Users, UserCheck, UserPlus, AlertCircle, CheckCircle, ShieldCheck
+  LogOut, ArrowLeft, Users, UserCheck, UserPlus, AlertCircle, CheckCircle, ShieldCheck, Trash2
 } from "lucide-react"
 import ThemeToggle from "@/components/ThemeToggle"
 
@@ -84,6 +84,27 @@ export default function SettingsPage() {
       console.error(err)
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const handleDeleteUser = async (userId, userName) => {
+    if (!confirm(`Are you sure you want to permanently delete user "${userName}"? This action cannot be undone.`)) {
+      return
+    }
+
+    try {
+      setError("")
+      setSuccess("")
+      const res = await courierPortalApi.deleteUser(userId)
+      if (res && !res.error) {
+        setSuccess(`User "${userName}" was successfully deleted.`)
+        fetchUsers() // Refresh list
+      } else {
+        setError(res?.error || `Failed to delete user: ${userName}`)
+      }
+    } catch (err) {
+      setError("An unexpected error occurred while deleting user.")
+      console.error(err)
     }
   }
 
@@ -267,7 +288,8 @@ export default function SettingsPage() {
                         <th className="pb-3 pr-4">Name / Email</th>
                         <th className="pb-3 pr-4">Role</th>
                         <th className="pb-3 pr-4">Status</th>
-                        <th className="pb-3">Joined</th>
+                        <th className="pb-3 pr-4">Joined</th>
+                        {user.role === 'ADMIN' && <th className="pb-3 text-right">Actions</th>}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -306,6 +328,21 @@ export default function SettingsPage() {
                               day: 'numeric'
                             })}
                           </td>
+                          {user.role === 'ADMIN' && (
+                            <td className="py-3.5 text-right whitespace-nowrap">
+                              {u.id !== user.id ? (
+                                <button
+                                  onClick={() => handleDeleteUser(u.id, u.name)}
+                                  className="text-slate-400 hover:text-red-600 dark:text-slate-500 dark:hover:text-red-400 p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                                  title="Delete User"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              ) : (
+                                <span className="text-[10px] text-slate-400 dark:text-slate-500 italic mr-2 font-medium">You</span>
+                              )}
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>
